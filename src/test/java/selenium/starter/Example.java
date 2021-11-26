@@ -22,17 +22,26 @@ public class Example {
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
     }
 
+    public void enterAndSubmitLoginCredentials(String username, String password) {
+        driver.get("http://localhost:3000/login");
+        WebElement usernameInputElement = driver.findElement(By.xpath("//input[@name='username']"));
+        WebElement passwordInputElement = driver.findElement(By.xpath("//input[@name='password']"));
+        WebElement submitButtonElement = driver.findElement(By.xpath("//input[@type='submit']"));
+
+        usernameInputElement.sendKeys(username);
+        passwordInputElement.sendKeys(password);
+
+        submitButtonElement.submit();
+    }
 
     @Test
-    public void titleShouldEqualToGoogle() throws Exception {
-        driver.get("http://www.google.com");
-        WebElement element = driver.findElement(By.name("q"));
+    public void loginFailShouldReturnError() throws Exception {
+        this.enterAndSubmitLoginCredentials("blablablaNotQxistingUser@gmail.com", "isthisapasswordatall");
 
-        element.sendKeys("Cheese!");
-        element.submit();
+        WebElement errorMessageElement = driver.findElement(By.xpath("//div[@class='alert alert-danger']"));
 
-        String expectedTitle = "Google";
-        assertEquals(expectedTitle, driver.getTitle());
+        String expectedErrorMessage = "Invalid username & password.";
+        assertEquals(expectedErrorMessage, errorMessageElement.getText());
     }
 
     @After
